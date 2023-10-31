@@ -106,53 +106,80 @@ export async function getAllUsers() {
     );
   }
 }
-// export async function sendInvitation(id:string) {
-//   try {
-//     const session = await getSession();
 
-//     if (!session?.user?.email) {
-//       return NextResponse.json(
-//         { message: "Not authenticated" },
-//         { status: 401 },
-//       );
-//     }
+export async function sendInvitation(id: string) {
+  try {
+    const session = await getSession();
 
-//     const currentUser = await db.user.findUnique({
-//       where: { email: session.user.email },
-//     });
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 },
+      );
+    }
 
-//     if (!currentUser) {
-//       return NextResponse.json({ message: "User not found" }, { status: 404 });
-//     }
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
 
-//     const invitedUser = await db.user.findUnique({
-//       where: { id },
-//     });
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
-//     if (!invitedUser) {
-//       return NextResponse.json({ message: "User not found" }, { status: 404 });
-//     }
+    const invitedUser = await db.user.findUnique({
+      where: { id },
+    });
 
-//     const invitation = await db.invitation.create({
-//       data: {
-//         invitedBy: {
-//           connect: {
-//             id: currentUser.id,
-//           },
-//         },
-//         invitedUser: {
-//           connect: {
-//             id: invitedUser.id,
-//           },
-//         },
-//       },
-//     });
+    if (!invitedUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
-//     return invitation;
-//   } catch (error) {
-//     return NextResponse.json(
-//       { message: "Something went wrong" },
-//       { status: 500 },
-//     );
-//   }
-// }
+    const invitation = await db.invitation.create({
+      data: {
+        invitedBy: currentUser.id,
+        invitedUser: invitedUser.id,
+      },
+    });
+
+    return invitation;
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function getInvitations() {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 },
+      );
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const invitations = await db.invitation.findMany({
+      where: {
+        invitedUser: currentUser.id,
+      },
+    });
+
+    return invitations;
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}

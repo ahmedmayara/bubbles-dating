@@ -14,11 +14,21 @@ interface UserCardProps {
 }
 
 export function UserCard({ users }: UserCardProps) {
+  const swipeRight = (id: string) => {
+    // hna bghina n3ayto l user li kayn f users
+    //hna bghina najoutiw invi bl id
+    console.log(id);
+  };
   return (
     <div>
-      <Cards className="h-screen w-full">
+      <Cards onEnd={() => console.log("end")} className="h-screen w-full">
         {users.map((user) => (
-          <Card key={user.id} className="h-full w-full rounded-xl shadow-lg">
+          <Card
+            key={user.id}
+            onSwipeLeft={() => console.log("swipe left")}
+            onSwipeRight={() => swipeRight(user.id)}
+            className="h-full w-full rounded-xl shadow-lg"
+          >
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
               <div className="flex cursor-grab flex-col overflow-hidden rounded-xl border bg-background shadow-lg">
                 {/** Profile image */}
@@ -50,26 +60,25 @@ export function UserCard({ users }: UserCardProps) {
                     <p className="text-2xl font-bold text-foreground">
                       {user.name},{" "}
                       <span className="font-medium text-muted-foreground">
-                        {new Date().getFullYear() -
-                          new Date(user.birthdate!).getFullYear()}
+                        20
                       </span>
                     </p>
                     <div className="flex flex-col space-y-2">
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <BriefcaseIcon size={16} />
                         <span>
-                          {user.occupation || "No occupation provided"}
+                          {user.occupation || "No occupation available"}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <MapPinIcon size={16} />
-                        <span>{user.location || "No location provided"}</span>
+                        <span>{user.location || "No location available"}</span>
                       </div>
                     </div>
                   </div>
                   <Separator className="w-full" />
-                  <p className="max-h-24 overflow-hidden overflow-ellipsis p-4 text-muted-foreground">
-                    {user.bio || "No bio provided"}
+                  <p className="p-4 text-muted-foreground">
+                    {user.bio || "No bio available"}
                   </p>
 
                   <div className="flex items-center justify-center space-x-4 pb-6">
