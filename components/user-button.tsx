@@ -3,15 +3,6 @@
 import { User } from "@prisma/client";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -23,21 +14,8 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { Badge, badgeVariants } from "./ui/badge";
 import { cn } from "@/lib/utils";
 
-import { interests } from "@/schemas/schemas";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CalendarIcon } from "@radix-ui/react-icons";
@@ -55,7 +33,9 @@ export function UserButton({ currentUser }: UserButtonProps) {
         <button className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
           <Avatar className="h-10 w-10">
             <AvatarImage src={currentUser.image!} alt={currentUser.name!} />
-            <AvatarFallback>{currentUser.name![0]}</AvatarFallback>
+            <AvatarFallback className="uppercase">
+              {currentUser.name![0]}
+            </AvatarFallback>
           </Avatar>
         </button>
       </SheetTrigger>

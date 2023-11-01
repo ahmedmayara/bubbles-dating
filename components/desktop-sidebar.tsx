@@ -2,35 +2,42 @@
 
 import { User } from "@prisma/client";
 import { SidebarItem } from "./sidebar-item";
-import { BellIcon, HomeIcon, LogOutIcon, MessagesSquare } from "lucide-react";
+import {
+  HomeIcon,
+  LogOutIcon,
+  MessagesSquare,
+  UserPlusIcon,
+} from "lucide-react";
 import { UserButton } from "./user-button";
 import { signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 interface DesktopSidebarProps {
   currentUser: User;
 }
 
 export function DesktopSidebar({ currentUser }: DesktopSidebarProps) {
+  const pathname = usePathname();
   const routes = [
     {
       label: "Home",
       href: "/app",
       icon: HomeIcon,
-      active: true,
+      active: pathname === "/app",
       onClick: () => {},
     },
     {
-      label: "Messages",
-      href: "/app/messages",
+      label: "Conversations",
+      href: "/app/conversations",
       icon: MessagesSquare,
-      active: false,
+      active: pathname === "/app/conversations",
       onClick: () => {},
     },
     {
-      label: "Notifications",
-      href: "#",
-      icon: BellIcon,
-      active: false,
+      label: "Invitations",
+      href: "/invitations",
+      icon: UserPlusIcon,
+      active: pathname === "/invitations",
       onClick: () => {},
     },
     {

@@ -1,6 +1,6 @@
-import { getAllConversations } from "@/actions/actions";
+import { getAllInvitations } from "@/actions/actions";
+import { InvitationsList } from "@/components/invitations-list";
 import { Sidebar } from "@/components/sidebar";
-import { ConversationsList } from "@/components/conversations-list";
 import React from "react";
 
 interface LayoutProps {
@@ -8,11 +8,12 @@ interface LayoutProps {
 }
 
 export default async function Layout({ children }: LayoutProps) {
-  const conversations = await getAllConversations();
+  const invitations = await getAllInvitations();
   return (
     <Sidebar>
       <div className="h-full">
-        <ConversationsList conversations={conversations} />
+        {/* @ts-ignore */}
+        <InvitationsList invitations={invitations} />
         {children}
       </div>
     </Sidebar>

@@ -6,19 +6,19 @@ import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { BriefcaseIcon, MapPinIcon, XIcon } from "lucide-react";
 import { AiFillHeart } from "react-icons/ai";
+import { IoIosWarning } from "react-icons/io";
 
 import Cards, { Card } from "react-swipe-card";
+import { getAllInvitations, sendInvitation } from "@/actions/actions";
 
 interface UserCardProps {
   users: User[];
+  invitations: Awaited<ReturnType<typeof getAllInvitations>>;
 }
 
-export function UserCard({ users }: UserCardProps) {
-  const swipeRight = (id: string) => {
-    // hna bghina n3ayto l user li kayn f users
-    //hna bghina najoutiw invi bl id
-    console.log(id);
-  };
+export function UserCard({ users, invitations }: UserCardProps) {
+  console.log(users);
+  console.log(invitations);
   return (
     <div>
       <Cards onEnd={() => console.log("end")} className="h-screen w-full">
@@ -26,13 +26,13 @@ export function UserCard({ users }: UserCardProps) {
           <Card
             key={user.id}
             onSwipeLeft={() => console.log("swipe left")}
-            onSwipeRight={() => swipeRight(user.id)}
+            onSwipeRight={() => sendInvitation(user.id)}
             className="h-full w-full rounded-xl shadow-lg"
           >
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
               <div className="flex cursor-grab flex-col overflow-hidden rounded-xl border bg-background shadow-lg">
                 {/** Profile image */}
-                <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-xl">
+                <div className="flex items-center justify-center overflow-hidden rounded-t-xl">
                   {user.image && (
                     <Image
                       src={user.image!}
@@ -77,7 +77,7 @@ export function UserCard({ users }: UserCardProps) {
                     </div>
                   </div>
                   <Separator className="w-full" />
-                  <p className="p-4 text-muted-foreground">
+                  <p className="max-h-24 overflow-hidden overflow-ellipsis p-4 text-muted-foreground">
                     {user.bio || "No bio available"}
                   </p>
 
@@ -97,6 +97,12 @@ export function UserCard({ users }: UserCardProps) {
                       variant={"outline"}
                     >
                       <AiFillHeart size={32} className="text-green-500" />
+                    </Button>
+                    <Button
+                      className="h-16 w-16 rounded-full shadow-xl"
+                      variant={"outline"}
+                    >
+                      <IoIosWarning size={32} className="text-yellow-600" />
                     </Button>
                   </div>
                 </div>

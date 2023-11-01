@@ -1,30 +1,37 @@
 "use client";
 
-import { BellIcon, HomeIcon, LogOutIcon, MessagesSquare } from "lucide-react";
+import {
+  HomeIcon,
+  LogOutIcon,
+  MessagesSquare,
+  UserPlusIcon,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
 import { MobileItem } from "./mobile-item";
+import { usePathname } from "next/navigation";
 
 export function MobileFooter() {
+  const pathname = usePathname();
   const routes = [
     {
       label: "Home",
       href: "/app",
       icon: HomeIcon,
-      active: true,
+      active: pathname === "/app",
       onClick: () => {},
     },
     {
       label: "Messages",
       href: "/app/messages",
       icon: MessagesSquare,
-      active: false,
+      active: pathname === "/app/messages",
       onClick: () => {},
     },
     {
-      label: "Notifications",
-      href: "#",
-      icon: BellIcon,
-      active: false,
+      label: "Invitations",
+      href: "/invitations",
+      icon: UserPlusIcon,
+      active: pathname === "/invitations",
       onClick: () => {},
     },
     {
@@ -37,20 +44,7 @@ export function MobileFooter() {
   ];
 
   return (
-    <div
-      className="
-        fixed 
-        bottom-0 
-        z-40 
-        flex 
-        w-full 
-        items-center 
-        justify-between 
-        border-t-[1px] 
-        bg-background
-        lg:hidden
-      "
-    >
+    <div className="fixed bottom-0 z-40 flex w-full items-center justify-between border-t-[1px] bg-background lg:hidden">
       {routes.map((route) => (
         <MobileItem
           key={route.href}

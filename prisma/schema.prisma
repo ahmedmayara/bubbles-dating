@@ -26,6 +26,9 @@ model User {
 
   messages Message[]
   accounts Account[]
+
+  invitationsSent    Invitation[] @relation("InvitationSender")
+  invitationsReceived Invitation[] @relation("InvitationReceiver")
 }
 
 model Account {
@@ -49,8 +52,13 @@ model Account {
 
 model Invitation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  invitedBy   String   @db.ObjectId
-  invitedUser String
+
+  senderId    String   @db.ObjectId
+  sender      User     @relation("InvitationSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId  String   @db.ObjectId
+  receiver    User     @relation("InvitationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  
   status      STATUS   @default(PENDING)
   createdAt   DateTime @default(now())
 }

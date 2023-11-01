@@ -3,10 +3,17 @@
 import bcrypt from "bcrypt";
 import { db } from "@/db/db";
 import { NextResponse } from "next/server";
-import { SignUpSchemaType, signUpSchema } from "@/schemas/schemas";
+import {
+  SignUpSchemaType,
+  UpdateProfileSchemaType,
+  signUpSchema,
+  updateProfileSchema,
+} from "@/schemas/schemas";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { revalidatePath } from "next/cache";
+import { User } from "@prisma/client";
 
 export async function signUp(data: SignUpSchemaType) {
   try {
@@ -50,15 +57,12 @@ export async function getSession() {
   return await getServerSession(authOptions);
 }
 
-export default async function getCurrentUser() {
+export default async function getCurrentUser(): Promise<User> {
   try {
     const session = await getSession();
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: "Not authenticated" },
-        { status: 401 },
-      );
+      throw new Error("Not authenticated");
     }
 
     const currentUser = await db.user.findUnique({
@@ -66,15 +70,12 @@ export default async function getCurrentUser() {
     });
 
     if (!currentUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      throw new Error("User not found");
     }
 
     return currentUser;
   } catch (error) {
-    return NextResponse.json(
-      { message: "Something went wrong" },
-      { status: 500 },
-    );
+    throw new Error("Something went wrong");
   }
 }
 
@@ -89,12 +90,25 @@ export async function getAllUsers() {
       );
     }
 
+    // Get all the users except the current user and the users that the current user has already invited them
     const users = await db.user.findMany({
-      orderBy: { createdAt: "desc" },
       where: {
-        NOT: {
-          email: session.user.email,
-        },
+        NOT: [
+          {
+            email: session.user.email,
+          },
+          {
+            conversations: {
+              some: {
+                participants: {
+                  some: {
+                    email: session.user.email,
+                  },
+                },
+              },
+            },
+          },
+        ],
       },
     });
 
@@ -136,8 +150,16 @@ export async function sendInvitation(id: string) {
 
     const invitation = await db.invitation.create({
       data: {
-        invitedBy: currentUser.id,
-        invitedUser: invitedUser.id,
+        sender: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+        receiver: {
+          connect: {
+            id: invitedUser.id,
+          },
+        },
       },
     });
 
@@ -150,7 +172,35 @@ export async function sendInvitation(id: string) {
   }
 }
 
-export async function getInvitations() {
+export async function getAllInvitations() {
+  const session = await getSession();
+
+  if (!session?.user?.email) {
+    throw new Error("Not authenticated");
+  }
+
+  const currentUser = await db.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!currentUser) {
+    throw new Error("User not found");
+  }
+
+  const invitations = await db.invitation.findMany({
+    where: {
+      receiverId: currentUser.id,
+      status: "PENDING",
+    },
+    include: {
+      sender: true,
+    },
+  });
+
+  return invitations;
+}
+
+export async function createConversation(id: string) {
   try {
     const session = await getSession();
 
@@ -169,13 +219,326 @@ export async function getInvitations() {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const invitations = await db.invitation.findMany({
-      where: {
-        invitedUser: currentUser.id,
+    const invitedUser = await db.user.findUnique({
+      where: { id },
+    });
+
+    if (!invitedUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const conversation = await db.conversation.create({
+      data: {
+        participants: {
+          connect: [
+            {
+              id: currentUser.id,
+            },
+            {
+              id: invitedUser.id,
+            },
+          ],
+        },
       },
     });
 
-    return invitations;
+    // update invitation status
+    await db.invitation.updateMany({
+      where: {
+        AND: [
+          {
+            receiverId: currentUser.id,
+          },
+          {
+            senderId: invitedUser.id,
+          },
+        ],
+      },
+      data: {
+        status: "ACCEPTED",
+      },
+    });
+
+    revalidatePath("/invitations");
+
+    return conversation;
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function getAllConversations() {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      throw new Error("Not authenticated");
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    const conversations = await db.conversation.findMany({
+      where: {
+        participants: {
+          some: {
+            id: currentUser.id,
+          },
+        },
+      },
+      include: {
+        participants: true,
+      },
+    });
+
+    return conversations;
+  } catch (error) {
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function getConversation(id: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      throw new Error("Not authenticated");
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    const conversation = await db.conversation.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        participants: true,
+        messages: {
+          include: {
+            sender: true,
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      throw new Error("Conversation not found");
+    }
+
+    return conversation;
+  } catch (error) {
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function getMessages(conversationId: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      throw new Error("Not authenticated");
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    const messages = await db.message.findMany({
+      where: {
+        conversationId,
+      },
+      include: {
+        sender: true,
+      },
+    });
+
+    return messages;
+  } catch (error) {
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function createMessage(conversationId: string, message: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 },
+      );
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const conversation = await db.conversation.findUnique({
+      where: {
+        id: conversationId,
+      },
+      include: {
+        participants: true,
+        messages: true,
+      },
+    });
+
+    if (!conversation) {
+      return NextResponse.json(
+        { message: "Conversation not found" },
+        { status: 404 },
+      );
+    }
+
+    const newMessage = await db.message.create({
+      data: {
+        body: message,
+        conversation: {
+          connect: {
+            id: conversationId,
+          },
+        },
+        sender: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+      },
+    });
+
+    revalidatePath(`/conversations/${conversationId}`);
+
+    return newMessage;
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function deleteConversation(conversationId: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 },
+      );
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const conversation = await db.conversation.findUnique({
+      where: {
+        id: conversationId,
+      },
+      include: {
+        participants: true,
+        messages: true,
+      },
+    });
+
+    if (!conversation) {
+      return NextResponse.json(
+        { message: "Conversation not found" },
+        { status: 404 },
+      );
+    }
+
+    const deletedConversation = await db.conversation.deleteMany({
+      where: {
+        id: conversationId,
+        participantsIds: {
+          hasSome: [currentUser.id],
+        },
+      },
+    });
+
+    revalidatePath("/conversations");
+
+    return deletedConversation;
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function updateProfile(data: UpdateProfileSchemaType) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 },
+      );
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const validation = updateProfileSchema.safeParse(data);
+
+    if (!validation.success) {
+      return NextResponse.json(validation.error.errors, {
+        status: 400,
+      });
+    }
+
+    const { name, image, birthdate, location, occupation, bio } = data;
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        name,
+        image,
+        birthdate,
+        location,
+        occupation,
+        bio,
+      },
+    });
+
+    return updatedUser;
   } catch (error) {
     return NextResponse.json(
       { message: "Something went wrong" },

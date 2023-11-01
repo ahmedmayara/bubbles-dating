@@ -39,33 +39,39 @@ export const signUpSchema = z
     }
   });
 
+export const createMessageSchema = z.object({
+  message: z.string().min(1, {
+    message: "The message field is required.",
+  }),
+});
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, {
+    message: "The name field must be at least 2 characters long.",
+  }),
+  image: z.string().min(1, {
+    message: "The image field is required.",
+  }),
+  birthdate: z.date().min(new Date("1900-01-01"), {
+    message: "Please enter a valid birthdate.",
+  }),
+  location: z.string().min(1, {
+    message: "The location field is required.",
+  }),
+  occupation: z.string().min(1, {
+    message: "The occupation field is required.",
+  }),
+  bio: z
+    .string()
+    .min(1, {
+      message: "The bio field is required.",
+    })
+    .max(300, {
+      message: "The bio field must be less than 300 characters long.",
+    }),
+});
+
 export type SignInSchemaType = z.infer<typeof signInSchema>;
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
-
-export const interests = [
-  {
-    id: 1,
-    name: "Exercise",
-    chosen: true,
-  },
-  {
-    id: 2,
-    name: "Photography",
-    chosen: true,
-  },
-  {
-    id: 3,
-    name: "Traveling",
-    chosen: true,
-  },
-  {
-    id: 4,
-    name: "Art",
-    chosen: false,
-  },
-  {
-    id: 5,
-    name: "Dancing",
-    chosen: false,
-  },
-];
+export type CreateMessageSchemaType = z.infer<typeof createMessageSchema>;
+export type UpdateProfileSchemaType = z.infer<typeof updateProfileSchema>;
