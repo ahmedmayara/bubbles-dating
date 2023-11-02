@@ -1,32 +1,33 @@
+"use client";
+
 import getCurrentUser, {
   getConversation,
   getMessages,
 } from "@/actions/actions";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { format } from "date-fns";
 import { GhostIcon } from "lucide-react";
-import { Message } from "@prisma/client";
 import { MessageBox } from "./message-box";
+import { useEffect, useRef } from "react";
 
 interface ConversationBodyProps {
-  conversationId: string;
+  conversation: Awaited<ReturnType<typeof getConversation>>;
+  initialMessages: Awaited<ReturnType<typeof getMessages>>;
+  currentUser: Awaited<ReturnType<typeof getCurrentUser>>;
 }
 
-export async function ConversationBody({
-  conversationId,
+export function ConversationBody({
+  conversation,
+  initialMessages,
+  currentUser,
 }: ConversationBodyProps) {
-  const conversation = await getConversation(conversationId);
-  const messages = await getMessages(conversationId);
-  const currentUser = await getCurrentUser();
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const isSender = (message: Message) => {
-    return message.senderId === currentUser.id;
-  };
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversation.id]);
+
   return (
     <div className="flex-1 overflow-y-auto">
-      {messages.length === 0 && <EmptyState />}
+      {initialMessages.length === 0 && <EmptyState />}
       {conversation.messages.map((message) => (
         <MessageBox
           key={message.id}
@@ -34,6 +35,7 @@ export async function ConversationBody({
           currentUser={currentUser}
         />
       ))}
+      <div ref={bottomRef} className="pt-12" />
     </div>
   );
 }
