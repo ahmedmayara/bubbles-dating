@@ -51,7 +51,7 @@ export function ConversationBody({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {initialMessages.length === 0 && <EmptyState />}
+      {messages.length === 0 && <EmptyState />}
       {messages.map((message) => (
         <MessageBox
           key={message.id}
@@ -59,7 +59,7 @@ export function ConversationBody({
           currentUser={currentUser}
         />
       ))}
-      <div ref={bottomRef} className="pt-20" />
+      <div ref={bottomRef} className="pt-12" />
     </div>
   );
 }

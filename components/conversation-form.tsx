@@ -25,8 +25,7 @@ export function ConversationForm({ conversationId }: ConversationFormProps) {
 
   async function onSubmit(data: CreateMessageSchemaType) {
     await createMessage(conversationId, data.message);
-    createMessageForm.reset();
-    console.log("message created");
+    createMessageForm.reset({ message: "" });
   }
   return (
     <div className="mb-14 border-t bg-white px-4 py-4 lg:mb-0">
@@ -41,7 +40,11 @@ export function ConversationForm({ conversationId }: ConversationFormProps) {
             render={({ field }) => (
               <FormControl>
                 <div className="relative w-full">
-                  <Input {...field} placeholder="Type a message" />
+                  <Input
+                    {...field}
+                    placeholder="Type a message"
+                    autoComplete="off"
+                  />
                 </div>
               </FormControl>
             )}
