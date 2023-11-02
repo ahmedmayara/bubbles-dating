@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import {
@@ -14,6 +16,8 @@ import {
 
 import { Trash2Icon } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
+import { deleteConversation } from "@/actions/actions";
+import { useRouter } from "next/navigation";
 
 interface DeleteConversationDialogProps {
   conversationId: string;
@@ -22,6 +26,7 @@ interface DeleteConversationDialogProps {
 export function DeleteConversationDialog({
   conversationId,
 }: DeleteConversationDialogProps) {
+  const router = useRouter();
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -40,6 +45,11 @@ export function DeleteConversationDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            onClick={() =>
+              deleteConversation(conversationId).then(() => {
+                router.push("/app/conversations");
+              })
+            }
             className={buttonVariants({ variant: "destructive" })}
           >
             Delete
