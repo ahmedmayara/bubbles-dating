@@ -1,9 +1,8 @@
 import { getAllInvitations } from "@/actions/actions";
-import React from "react";
 import { UserButton } from "./user-button";
 import { Button } from "./ui/button";
 import AcceptInvitationButton from "./accept-invitation-button";
-import { format } from "date-fns";
+import { formatDistance } from "date-fns";
 
 interface InvitationListItemProps {
   invitation: Awaited<ReturnType<typeof getAllInvitations>>[0];
@@ -21,16 +20,20 @@ export function InvitationListItem({ invitation }: InvitationListItemProps) {
         </div>
 
         <div className="pt-2 text-xs text-muted-foreground">
+          <p>{invitation.sender.name} invited you to join a conversation.</p>
+        </div>
+
+        <div className="pt-2 text-xs text-muted-foreground">
           <p>
-            Sent on {format(invitation.createdAt, "MMMM dd, yyyy").toString()}
+            {formatDistance(new Date(invitation.createdAt), new Date(), {
+              addSuffix: true,
+            })}
           </p>
         </div>
 
         <div className="flex items-center justify-end gap-2 pt-4">
           <AcceptInvitationButton id={invitation.sender.id} />
-          <Button size={"sm"} variant={"outline"}>
-            Decline
-          </Button>
+          <Button size={"sm"}>Decline</Button>
         </div>
       </div>
     </>

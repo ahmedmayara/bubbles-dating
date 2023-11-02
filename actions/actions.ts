@@ -14,6 +14,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
 import { User } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher";
 
 export async function signUp(data: SignUpSchemaType) {
   try {
@@ -426,9 +427,16 @@ export async function createMessage(conversationId: string, message: string) {
           },
         },
       },
+      include: {
+        sender: true,
+      },
     });
 
-    revalidatePath(`/conversations/${conversationId}`);
+    await pusherServer.trigger(
+      `conversation-${conversationId}`,
+      "messages:new",
+      newMessage,
+    );
 
     return newMessage;
   } catch (error) {

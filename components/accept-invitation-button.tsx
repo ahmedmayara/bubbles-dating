@@ -12,7 +12,7 @@ export default function AcceptInvitationButton({
   id,
 }: AcceptInvitationButtonProps) {
   return (
-    <Button size="sm" onClick={() => createConversation(id)}>
+    <Button size="sm" variant="success" onClick={() => createConversation(id)}>
       Accept
     </Button>
   );

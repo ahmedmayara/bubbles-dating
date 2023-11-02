@@ -6,7 +6,9 @@ import getCurrentUser, {
 } from "@/actions/actions";
 import { GhostIcon } from "lucide-react";
 import { MessageBox } from "./message-box";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { pusherClient } from "@/lib/pusher";
+import { find } from "lodash";
 
 interface ConversationBodyProps {
   conversation: Awaited<ReturnType<typeof getConversation>>;
@@ -14,28 +16,50 @@ interface ConversationBodyProps {
   currentUser: Awaited<ReturnType<typeof getCurrentUser>>;
 }
 
+type Message = Awaited<ReturnType<typeof getMessages>>[0];
+
 export function ConversationBody({
   conversation,
   initialMessages,
   currentUser,
 }: ConversationBodyProps) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    pusherClient.subscribe(`conversation-${conversation.id}`);
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    const messageHandler = (message: Message) => {
+      setMessages((currentMessages) => {
+        if (find(currentMessages, { id: message.id })) {
+          return currentMessages;
+        }
+        return [...currentMessages, message];
+      });
+
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    pusherClient.bind("messages:new", messageHandler);
+
+    return () => {
+      pusherClient.unsubscribe(`conversation-${conversation.id}`);
+      pusherClient.unbind("messages:new");
+    };
   }, [conversation.id]);
 
   return (
     <div className="flex-1 overflow-y-auto">
       {initialMessages.length === 0 && <EmptyState />}
-      {conversation.messages.map((message) => (
+      {messages.map((message) => (
         <MessageBox
           key={message.id}
           message={message}
           currentUser={currentUser}
         />
       ))}
-      <div ref={bottomRef} className="pt-12" />
+      <div ref={bottomRef} className="pt-20" />
     </div>
   );
 }
