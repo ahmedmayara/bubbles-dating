@@ -40,7 +40,7 @@ export function MessageBox({ message, currentUser }: MessageBoxProps) {
 
         <div
           className={cn(
-            "w-fit overflow-hidden rounded-full px-3 py-2 text-sm",
+            "w-fit max-w-sm overflow-hidden rounded-xl px-3 py-2 text-sm",
             isSender(message) ? "bg-primary text-white" : "bg-gray-200",
           )}
         >

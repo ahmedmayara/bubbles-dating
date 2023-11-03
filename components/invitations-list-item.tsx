@@ -11,7 +11,7 @@ interface InvitationListItemProps {
 export function InvitationListItem({ invitation }: InvitationListItemProps) {
   return (
     <>
-      <div className="relative flex w-full flex-col rounded-lg bg-accent p-4">
+      <div className="relative mb-2.5 flex w-full flex-col rounded-lg bg-accent p-4">
         <div className="flex items-center gap-2">
           <UserButton currentUser={invitation.sender} />
           <p className="text-sm font-medium text-foreground">
