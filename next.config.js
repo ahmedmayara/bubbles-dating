@@ -8,6 +8,7 @@ const nextConfig = {
       "lh3.googleusercontent.com",
       "upload.wikimedia.org",
       "scontent.ftun1-2.fna.fbcdn.net",
+      "scontent.ftun10-1.fna.fbcdn.net",
     ],
   },
 };

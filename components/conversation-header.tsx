@@ -31,7 +31,7 @@ export async function ConversationHeader({
     <div className="flex w-full items-center justify-between border-b bg-white px-4 py-3 shadow-sm sm:px-4 lg:px-6">
       <div className="flex items-center gap-3">
         <Link
-          href="/conversations"
+          href="/app/conversations"
           className="block cursor-pointer text-primary transition lg:hidden"
         >
           <ChevronLeft size={25} />

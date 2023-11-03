@@ -50,7 +50,11 @@ export function ConversationForm({ conversationId }: ConversationFormProps) {
             )}
           />
 
-          <Button size={"icon"} type="submit">
+          <Button
+            size={"icon"}
+            type="submit"
+            disabled={createMessageForm.formState.isSubmitting}
+          >
             <SendIcon className="h-4 w-4" />
           </Button>
         </form>
