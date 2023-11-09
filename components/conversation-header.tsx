@@ -1,9 +1,7 @@
 import getCurrentUser, { getConversation } from "@/actions/actions";
-import React from "react";
-import { HiChevronLeft } from "react-icons/hi";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ChevronLeft, MoreHorizontalIcon, Trash2Icon } from "lucide-react";
+import { ChevronLeft, MoreHorizontalIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +12,7 @@ import {
 import { Button } from "./ui/button";
 import { format } from "date-fns";
 import { DeleteConversationDialog } from "./delete-conversation-dialog";
+import { ViewProfileDialog } from "./view-profile-dialog";
 
 interface ConversationHeaderProps {
   conversationId: string;
@@ -63,17 +62,18 @@ export async function ConversationHeader({
               size={"icon"}
               className="data-[state=open]:bg-muted"
             >
-              <MoreHorizontalIcon className="h-5 w-5 text-foreground" />
+              <MoreHorizontalIcon className="h-4 w-4 text-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
-              <DropdownMenuItem>View Profile</DropdownMenuItem>
               <DropdownMenuItem>Block</DropdownMenuItem>
               <DropdownMenuItem>Report</DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {user && <ViewProfileDialog user={user} />}
 
         <DeleteConversationDialog conversationId={conversationId} />
       </div>

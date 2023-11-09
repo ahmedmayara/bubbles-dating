@@ -9,6 +9,7 @@ const nextConfig = {
       "upload.wikimedia.org",
       "scontent.ftun1-2.fna.fbcdn.net",
       "scontent.ftun10-1.fna.fbcdn.net",
+      "utfs.io",
     ],
   },
 };

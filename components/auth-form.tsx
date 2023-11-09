@@ -39,6 +39,7 @@ import { signUp } from "@/actions/actions";
 import { signIn, useSession } from "next-auth/react";
 import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/hooks/useUser";
 
 export function AuthForm() {
   const { toast } = useToast();
@@ -48,6 +49,7 @@ export function AuthForm() {
   const [isLoading, setIsLoading] = React.useState(false);
   const session = useSession();
   const router = useRouter();
+  const { setEmail, setName, setPassword } = useUser();
 
   React.useEffect(() => {
     if (session?.status === "authenticated") {
@@ -74,7 +76,10 @@ export function AuthForm() {
   async function signUpOnSubmit(values: SignUpSchemaType) {
     try {
       await signUp(values).then(() => {
-        signIn("credentials", values);
+        setName(values.name);
+        setEmail(values.email);
+        setPassword(values.password);
+        router.push("/setup-account");
       });
       toast({
         title: "Success",

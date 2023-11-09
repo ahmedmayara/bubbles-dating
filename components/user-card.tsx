@@ -10,6 +10,7 @@ import { IoIosWarning } from "react-icons/io";
 
 import Cards, { Card } from "react-swipe-card";
 import { getAllInvitations, sendInvitation } from "@/actions/actions";
+import { format } from "date-fns";
 
 interface UserCardProps {
   users: User[];
@@ -60,7 +61,8 @@ export function UserCard({ users, invitations }: UserCardProps) {
                     <p className="text-2xl font-bold text-foreground">
                       {user.name},{" "}
                       <span className="font-medium text-muted-foreground">
-                        20
+                        {new Date().getFullYear() -
+                          new Date(user?.birthdate!).getFullYear()}
                       </span>
                     </p>
                     <div className="flex flex-col space-y-2">
@@ -72,7 +74,10 @@ export function UserCard({ users, invitations }: UserCardProps) {
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <MapPinIcon size={16} />
-                        <span>{user.location || "No location available"}</span>
+                        <span>
+                          {user.country + ", " + user.city ||
+                            "No location available"}
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -5,6 +5,7 @@ import getCurrentUser, {
 import { ConversationBody } from "@/components/conversation-body";
 import { ConversationForm } from "@/components/conversation-form";
 import { ConversationHeader } from "@/components/conversation-header";
+import { Spinner } from "@/components/spinner";
 import { Loader2Icon } from "lucide-react";
 import { Suspense } from "react";
 
@@ -39,7 +40,7 @@ function LoadingState() {
   return (
     <div className="h-screen bg-secondary lg:ml-80">
       <div className="flex h-full flex-col items-center justify-center">
-        <Loader2Icon className="h-16 w-16 animate-spin" />
+        <Spinner size="xl" />
       </div>
     </div>
   );

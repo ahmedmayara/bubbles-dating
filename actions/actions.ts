@@ -4,8 +4,10 @@ import bcrypt from "bcrypt";
 import { db } from "@/db/db";
 import { NextResponse } from "next/server";
 import {
+  SetupAccountSchemaType,
   SignUpSchemaType,
   UpdateProfileSchemaType,
+  setupAccountSchema,
   signUpSchema,
   updateProfileSchema,
 } from "@/schemas/schemas";
@@ -91,7 +93,7 @@ export async function getAllUsers() {
       );
     }
 
-    // Get all the users except the current user and the users that the current user has already invited them
+    // Get all the users except the current user and the users that the current user has already invited them and
     const users = await db.user.findMany({
       where: {
         NOT: [
@@ -503,26 +505,9 @@ export async function deleteConversation(conversationId: string) {
   }
 }
 
-export async function updateProfile(data: UpdateProfileSchemaType) {
+export async function setUpAccount(data: SetupAccountSchemaType) {
   try {
-    const session = await getSession();
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: "Not authenticated" },
-        { status: 401 },
-      );
-    }
-
-    const currentUser = await db.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!currentUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    const validation = updateProfileSchema.safeParse(data);
+    const validation = setupAccountSchema.safeParse(data);
 
     if (!validation.success) {
       return NextResponse.json(validation.error.errors, {
@@ -530,19 +515,27 @@ export async function updateProfile(data: UpdateProfileSchemaType) {
       });
     }
 
-    const { name, image, birthdate, location, occupation, bio } = data;
+    const { name, email, birthdate, image, bio, occupation, country, city } =
+      data;
+
+    const currentUser = await db.user.findUnique({
+      where: { email },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
     const updatedUser = await db.user.update({
-      where: {
-        id: currentUser.id,
-      },
+      where: { email },
       data: {
         name,
-        image,
         birthdate,
-        location,
-        occupation,
+        image,
         bio,
+        occupation,
+        country: country.label,
+        city,
       },
     });
 

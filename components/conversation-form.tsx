@@ -21,6 +21,9 @@ interface ConversationFormProps {
 export function ConversationForm({ conversationId }: ConversationFormProps) {
   const createMessageForm = useForm<CreateMessageSchemaType>({
     resolver: zodResolver(createMessageSchema),
+    defaultValues: {
+      message: "",
+    },
   });
 
   async function onSubmit(data: CreateMessageSchemaType) {
@@ -53,7 +56,10 @@ export function ConversationForm({ conversationId }: ConversationFormProps) {
           <Button
             size={"icon"}
             type="submit"
-            disabled={createMessageForm.formState.isSubmitting}
+            disabled={
+              createMessageForm.formState.isSubmitting ||
+              createMessageForm.watch("message") === ""
+            }
           >
             <SendIcon className="h-4 w-4" />
           </Button>

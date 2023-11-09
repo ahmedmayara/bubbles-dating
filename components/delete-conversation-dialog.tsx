@@ -30,7 +30,7 @@ export function DeleteConversationDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size={"icon"}>
+        <Button variant="ghost" size={"icon"}>
           <Trash2Icon className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>

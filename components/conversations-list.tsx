@@ -1,5 +1,7 @@
 import getCurrentUser, { getAllConversations } from "@/actions/actions";
 import { ConversationsListItem } from "./conversation-list-item";
+import { ConversationsSearch } from "./conversations-search";
+import { GhostIcon } from "lucide-react";
 
 interface ConversationsListProps {
   conversations: Awaited<ReturnType<typeof getAllConversations>>;
@@ -16,6 +18,11 @@ export async function ConversationsList({
           <div className="py-4 text-2xl font-bold text-foreground">
             Conversations
           </div>
+
+          <ConversationsSearch
+            conversations={conversations}
+            currentUser={currentUser}
+          />
         </div>
         {Array.isArray(conversations) &&
           conversations.map((conversation) => (
@@ -27,12 +34,15 @@ export async function ConversationsList({
           ))}
 
         {conversations.length === 0 && (
-          <div className="flex flex-col gap-2 text-left">
-            <div className="text-xl font-semibold text-muted-foreground">
-              No conversations yet
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Match with someone to start a conversation
+          <div className="mt-4 flex flex-col items-center justify-center gap-2">
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted p-4">
+              <GhostIcon className="h-10 w-10 text-muted-foreground" />
+              <p className="text-sm font-medium text-muted-foreground">
+                No conversations found
+              </p>
+              <span className="text-xs text-muted-foreground">
+                Start a conversation with someone!
+              </span>
             </div>
           </div>
         )}

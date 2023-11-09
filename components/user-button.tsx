@@ -80,7 +80,8 @@ export function UserButton({ currentUser }: UserButtonProps) {
               <Calendar
                 mode="single"
                 className="w-full"
-                selected={currentUser.birthdate || undefined}
+                defaultMonth={new Date(currentUser.birthdate!)}
+                selected={new Date(currentUser.birthdate!)}
                 initialFocus
               />
             </PopoverContent>
@@ -91,9 +92,15 @@ export function UserButton({ currentUser }: UserButtonProps) {
           <Label htmlFor="email">Email</Label>
           <Input id="email" value={currentUser.email!} disabled />
         </div>
+
         <div className="mt-6 grid gap-2">
-          <Label>Location</Label>
-          <Input value={currentUser.location!} />
+          <Label htmlFor="country">Country</Label>
+          <Input id="country" value={currentUser.country!} />
+        </div>
+
+        <div className="mt-6 grid gap-2">
+          <Label htmlFor="city">City</Label>
+          <Input id="city" value={currentUser.city!} />
         </div>
 
         <div className="mt-6 grid gap-2">
@@ -103,7 +110,7 @@ export function UserButton({ currentUser }: UserButtonProps) {
           </Textarea>
         </div>
 
-        <SheetFooter className="mt-32">
+        <SheetFooter className="pt-10">
           <Button variant={"outline"} className="w-full">
             Save
           </Button>
