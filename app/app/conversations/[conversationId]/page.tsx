@@ -6,7 +6,6 @@ import { ConversationBody } from "@/components/conversation-body";
 import { ConversationForm } from "@/components/conversation-form";
 import { ConversationHeader } from "@/components/conversation-header";
 import { Spinner } from "@/components/spinner";
-import { Loader2Icon } from "lucide-react";
 import { Suspense } from "react";
 
 interface PageProps {

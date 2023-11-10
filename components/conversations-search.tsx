@@ -14,15 +14,18 @@ import {
 } from "./ui/command";
 import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface ConversationsSearchProps {
   conversations: Awaited<ReturnType<typeof getAllConversations>>;
   currentUser: User;
+  className?: string;
 }
 
 export function ConversationsSearch({
   conversations,
   currentUser,
+  className,
 }: ConversationsSearchProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const router = useRouter();
@@ -45,11 +48,18 @@ export function ConversationsSearch({
     };
   }, []);
 
+  if (conversations.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="group mb-4 flex w-full items-center gap-x-2 rounded-full border bg-muted px-3 py-2 transition-colors duration-200 hover:bg-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+        className={cn(
+          "group mb-4 flex w-full items-center gap-x-2 rounded-full border bg-muted px-3 py-2 transition-colors duration-200 hover:bg-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent",
+          className,
+        )}
       >
         <SearchIcon className="h-4 w-4 text-muted-foreground transition-colors duration-200 group-hover:text-foreground" />
         <p className="text-sm font-medium text-muted-foreground transition-colors duration-200 group-hover:text-foreground">

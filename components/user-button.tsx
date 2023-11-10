@@ -21,22 +21,36 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
+import useActiveList from "@/hooks/useActiveList";
 
 interface UserButtonProps {
   currentUser: User;
 }
 
 export function UserButton({ currentUser }: UserButtonProps) {
+  const { members } = useActiveList();
+
+  const isActive = members.indexOf(currentUser?.email!) !== -1;
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={currentUser.image!} alt={currentUser.name!} />
-            <AvatarFallback className="uppercase">
-              {currentUser.name![0]}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={currentUser.image!} alt={currentUser.name!} />
+              <AvatarFallback className="uppercase">
+                {currentUser.name![0]}
+              </AvatarFallback>
+            </Avatar>
+
+            {isActive && (
+              <div className="absolute bottom-0 right-0">
+                <div className="flex h-3 w-3 items-center justify-center rounded-full border-2 border-background bg-green-500">
+                  <span className="sr-only">Online</span>
+                </div>
+              </div>
+            )}
+          </div>
         </button>
       </SheetTrigger>
       <SheetContent side={"right"}>

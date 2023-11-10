@@ -11,8 +11,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { SendIcon } from "lucide-react";
+import { SendIcon, SmileIcon } from "lucide-react";
 import { createMessage } from "@/actions/actions";
+import { EmojiPicker } from "./emoji-picker";
 
 interface ConversationFormProps {
   conversationId: string;
@@ -53,16 +54,26 @@ export function ConversationForm({ conversationId }: ConversationFormProps) {
             )}
           />
 
-          <Button
-            size={"icon"}
-            type="submit"
-            disabled={
-              createMessageForm.formState.isSubmitting ||
-              createMessageForm.watch("message") === ""
-            }
-          >
-            <SendIcon className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <EmojiPicker
+              onChange={(emoji: string) =>
+                createMessageForm.setValue(
+                  "message",
+                  createMessageForm.watch("message") + emoji,
+                )
+              }
+            />
+            <Button
+              size={"icon"}
+              type="submit"
+              disabled={
+                createMessageForm.formState.isSubmitting ||
+                createMessageForm.watch("message") === ""
+              }
+            >
+              <SendIcon className="h-4 w-4" />
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

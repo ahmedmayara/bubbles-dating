@@ -21,10 +21,10 @@ export function MobileFooter() {
       onClick: () => {},
     },
     {
-      label: "Messages",
-      href: "/app/messages",
+      label: "Conversations",
+      href: "/app/conversations",
       icon: MessagesSquare,
-      active: pathname === "/app/messages",
+      active: pathname === "/app/conversations",
       onClick: () => {},
     },
     {
