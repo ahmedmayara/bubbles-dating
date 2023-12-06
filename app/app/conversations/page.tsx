@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAllConversations } from "@/actions/actions";
 import { MobileConversationsList } from "@/components/mobile-conversations-list";
 import { MessageCircleIcon } from "lucide-react";

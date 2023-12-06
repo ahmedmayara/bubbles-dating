@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { GetAllUsersFilters, getAllUsers } from "@/actions/actions";
 import { SwipeLeftPlaceholder } from "@/components/swipe-left-placeholder";
 import { SwipeRightPlaceholder } from "@/components/swipe-right-placeholder";
