@@ -44,7 +44,7 @@ export function CountrySelect({ value, onValueChange }: CountrySelectProps) {
         </SelectTrigger>
         <SelectContent className="max-h-60 overflow-y-auto">
           {countries.map((country) => (
-            <SelectGroup>
+            <SelectGroup key={country.value}>
               <SelectItem value={country.value}>
                 <div className="flex flex-row items-center gap-2">
                   <div>{country.flag}</div>

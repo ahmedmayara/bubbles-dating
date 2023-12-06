@@ -4,8 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { DeleteConversationDialog } from "./delete-conversation-dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { format } from "date-fns";
-import { BlockUserButton } from "./block-user-button";
-import { DeblockUserButton } from "./deblock-user-button";
+import { ConversationActions } from "./conversation-actions";
 
 interface ConversationHeaderProps {
   conversationId: string;
@@ -52,13 +51,12 @@ export async function ConversationHeader({
       </div>
 
       <div className="flex items-center gap-2">
+        <ConversationActions
+          userId={user?.id!}
+          status={status}
+          meOrnot={meOrnot}
+        />
         <DeleteConversationDialog conversationId={conversationId} />
-        {status === "active" && (
-          <BlockUserButton id={user?.id!} idofconv={conversationId} />
-        )}
-        {status === "BLOCKED" && meOrnot && (
-          <DeblockUserButton id={user?.id!} idofconv={conversationId} />
-        )}
       </div>
     </div>
   );

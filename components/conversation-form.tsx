@@ -11,7 +11,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { SendIcon, SmileIcon } from "lucide-react";
+import { AlertCircleIcon, SendIcon, SmileIcon } from "lucide-react";
 import { createMessage } from "@/actions/actions";
 import { EmojiPicker } from "./emoji-picker";
 import { useToast } from "./ui/use-toast";
@@ -48,38 +48,18 @@ export function ConversationForm({
           className="flex w-full items-center gap-2 lg:gap-4"
         >
           {status === "BLOCKED" && meOrnot ? (
-            <div className=" flex w-full items-center justify-center">
-              <>
-                vous pouver pas envoyer des message a cette personne...
-                <a
-                  style={{ color: "blue", cursor: "pointer" }}
-                  onClick={() =>
-                    toast({
-                      title: "vous avez bloker votre friend",
-                      description: "error",
-                      variant: "success",
-                    })
-                  }
-                >
-                  see why?
-                </a>
-              </>
+            <div className="flex w-full items-center justify-center gap-2">
+              <AlertCircleIcon className="h-4 w-4 text-muted-foreground" />
+              <h1 className="text-sm font-semibold text-muted-foreground">
+                You cannot send messages to this user.
+              </h1>
             </div>
           ) : status === "BLOCKED" && !meOrnot ? (
-            <div className=" flex w-full items-center justify-center">
-              <p>vous pouver pas envoyer des message a cette personne... </p>
-              <a
-                style={{ color: "blue", cursor: "pointer" }}
-                onClick={() =>
-                  toast({
-                    title: "you friend has bloked you",
-                    description: "error",
-                    variant: "destructive",
-                  })
-                }
-              >
-                see why?
-              </a>
+            <div className="flex w-full items-center justify-center gap-2">
+              <AlertCircleIcon className="h-4 w-4 text-muted-foreground" />
+              <h1 className="text-sm font-semibold text-muted-foreground">
+                You cannot send messages to this user.
+              </h1>
             </div>
           ) : (
             <>
@@ -106,6 +86,15 @@ export function ConversationForm({
               >
                 <SendIcon className="h-4 w-4" />
               </Button>
+
+              <EmojiPicker
+                onChange={(emoji) => {
+                  createMessageForm.setValue(
+                    "message",
+                    createMessageForm.getValues("message") + emoji,
+                  );
+                }}
+              />
             </>
           )}
         </form>

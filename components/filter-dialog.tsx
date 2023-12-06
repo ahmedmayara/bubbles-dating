@@ -180,6 +180,22 @@ export function FilterDialog() {
           <Button onClick={onSubmit} className="w-full">
             Apply
           </Button>
+
+          {params && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+                setSelectedGender("");
+                setselectedAge([18, 28]);
+                setSelectedLocation(undefined);
+                router.push("/app");
+              }}
+              className="mr-2 w-full"
+            >
+              Reset filters
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -4,7 +4,7 @@ import { User } from "@prisma/client";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
-import { BriefcaseIcon, MapPinIcon, XIcon } from "lucide-react";
+import { BriefcaseIcon, GhostIcon, MapPinIcon, XIcon } from "lucide-react";
 import { AiFillHeart } from "react-icons/ai";
 import { IoIosWarning } from "react-icons/io";
 

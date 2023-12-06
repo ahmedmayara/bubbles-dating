@@ -2,9 +2,6 @@ import getCurrentUser, { getAllConversations } from "@/actions/actions";
 import { ConversationsSearch } from "./conversations-search";
 import { Separator } from "./ui/separator";
 import { MobileConversationsListItem } from "./mobile-conversation-item";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { UserButton } from "./user-button";
 import { AvatarButton } from "./avatar-button";
 
 interface MobileConversationsListProps {
@@ -35,11 +32,14 @@ export async function MobileConversationsList({
       <div className="w-full overflow-x-auto">
         <div className="flex w-max space-x-6 py-4">
           {conversations.map((conversation) => (
-            <>
+            <div key={conversation.id}>
               {conversation.participants.map((user) => {
                 if (user.id !== currentUser.id) {
                   return (
-                    <div className="flex flex-col items-center justify-center gap-2.5">
+                    <div
+                      className="flex flex-col items-center justify-center gap-2.5"
+                      key={user.id}
+                    >
                       <AvatarButton key={user.id} user={user} />
                       <p className="text-sm text-foreground">
                         {user.name?.split(" ")[0]}
@@ -48,7 +48,7 @@ export async function MobileConversationsList({
                   );
                 }
               })}
-            </>
+            </div>
           ))}
         </div>
       </div>

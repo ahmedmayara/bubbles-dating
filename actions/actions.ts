@@ -4,13 +4,19 @@ import bcrypt from "bcrypt";
 import { db } from "@/db/db";
 import { NextResponse } from "next/server";
 import {
+  GENDERS,
   SetupAccountSchemaType,
   SignUpSchemaType,
-  UpdateProfileSchemaType,
   setupAccountSchema,
   signUpSchema,
-  updateProfileSchema,
 } from "@/schemas/schemas";
+
+export interface GetAllUsersFilters {
+  gender?: string;
+  maxAge?: number;
+  minAge?: number;
+  location?: string;
+}
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -82,9 +88,11 @@ export default async function getCurrentUser(): Promise<User> {
   }
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(filters: GetAllUsersFilters) {
   try {
     const session = await getSession();
+
+    const { gender, maxAge, minAge, location } = filters;
 
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -93,9 +101,20 @@ export async function getAllUsers() {
       );
     }
 
+    let query: any = {};
+
+    if (gender) {
+      query.gender = gender;
+    }
+
+    if (location) {
+      query.country = location;
+    }
+
     // Get all the users except the current user and the users that the current user has already invited them and
     const users = await db.user.findMany({
       where: {
+        ...query,
         NOT: [
           {
             email: session.user.email,
@@ -721,7 +740,7 @@ export async function deblockUser(id: string) {
         },
       },
       data: {
-        status: "active",
+        status: "ACTIVE",
       },
     });
 

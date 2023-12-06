@@ -35,8 +35,8 @@ model User {
   blockedMe   Block[] @relation("BlockedMe")
   blockedByMe Block[] @relation("BlockedByMe")
 
-  userSignal1 Signal[] @relation("user1")
-  userSignal2 Signal[] @relation("user2")
+  reportedMe   Report[] @relation("ReportedMe")
+  reportedByMe Report[] @relation("ReportedByMe")
 }
 
 model Account {
@@ -74,7 +74,7 @@ model Invitation {
 model Conversation {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
-  status    String @default("active")
+  status    CONVERSATION_STATUS @default(ACTIVE)
   conversationBlockedBy String @default("")
 
   participantsIds String[] @db.ObjectId
@@ -106,14 +106,22 @@ model Block {
   blocked   User   @relation("BlockedByMe", fields: [blockedId], references: [id], onDelete: Cascade)
 }
 
-model Signal {
+model Report {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
-  iduser1   String   @db.ObjectId
-  user1     User     @relation("user1", fields: [iduser1], references: [id], onDelete: Cascade)
-  iduser2   String   @db.ObjectId
-  receiver  User     @relation("user2", fields: [iduser2], references: [id], onDelete: Cascade)
-  raison    String
+
+  reporterId String @db.ObjectId
+  reporter   User   @relation("ReportedByMe", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reportedId String @db.ObjectId
+  reported   User   @relation("ReportedMe", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  reason String
+}
+
+enum CONVERSATION_STATUS {
+  ACTIVE
+  BLOCKED
 }
 
 enum STATUS {
