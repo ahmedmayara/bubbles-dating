@@ -46,6 +46,10 @@ export function MessageBox({ message, currentUser }: MessageBoxProps) {
         >
           {message.body}
         </div>
+
+        <div className="text-xs text-muted-foreground">
+          {format(new Date(message.createdAt), "EEEE, MMMM do")}
+        </div>
       </div>
     </div>
   );

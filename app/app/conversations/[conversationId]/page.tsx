@@ -18,17 +18,26 @@ export default async function Page({ params }: PageProps) {
   const conversation = await getConversation(params.conversationId);
   const messages = await getMessages(params.conversationId);
   const currentUser = await getCurrentUser();
+  const meOrnot = conversation?.conversationBlockedBy === currentUser.id;
   return (
     <Suspense fallback={<LoadingState />}>
       <div className="h-screen bg-secondary lg:ml-80">
         <div className="flex h-full flex-col">
-          <ConversationHeader conversationId={params.conversationId} />
+          <ConversationHeader
+            conversationId={params.conversationId}
+            meOrnot={meOrnot}
+            status={conversation?.status!}
+          />
           <ConversationBody
             conversation={conversation}
             initialMessages={messages}
             currentUser={currentUser}
           />
-          <ConversationForm conversationId={params.conversationId} />
+          <ConversationForm
+            conversationId={params.conversationId}
+            meOrnot={meOrnot}
+            status={conversation?.status!}
+          />
         </div>
       </div>
     </Suspense>

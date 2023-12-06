@@ -31,29 +31,57 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ImageUpload } from "./image-upload";
-import { CheckIcon } from "lucide-react";
+import {
+  CheckCircle2Icon,
+  CheckIcon,
+  Globe2Icon,
+  ImageIcon,
+  LucideIcon,
+  UserIcon,
+} from "lucide-react";
 import { setUpAccount } from "@/actions/actions";
 import { signIn } from "next-auth/react";
 
-const steps = [
+import { GENDERS } from "@/schemas/schemas";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface StepsType {
+  id: string;
+  name: string;
+  fields?: (keyof SetupAccountSchemaType)[];
+  icon?: LucideIcon;
+}
+
+const steps: StepsType[] = [
   {
     id: "Step 1",
     name: "Fundamental Details",
     fields: ["name", "birthdate", "email", "occupation", "bio"],
+    icon: UserIcon,
   },
   {
     id: "Step 2",
     name: "Geographic Coordinates",
     fields: ["country", "city"],
+    icon: Globe2Icon,
   },
   {
     id: "Step 3",
     name: "Personal Picture",
     fields: ["image"],
+    icon: ImageIcon,
   },
   {
     id: "Step 4",
     name: "Complete",
+    icon: CheckCircle2Icon,
   },
 ];
 
@@ -139,13 +167,19 @@ export function SetUpAccountForm() {
                 </div>
               ) : currentStep === index ? (
                 <div
-                  className="flex w-full flex-col border-l-4 border-primary py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
+                  className="flex w-full items-center border-l-4 border-primary py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
                   aria-current="step"
                 >
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {step.id}
-                  </span>
-                  <span className="text-sm font-medium">{step.name}</span>
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary transition-colors group-hover:bg-primary/80">
+                    {step.icon && <step.icon className="h-4 w-4 text-white" />}
+                  </div>
+
+                  <div className="flex flex-1 flex-col md:ml-4">
+                    <span className="text-sm font-medium text-primary transition-colors">
+                      {step.id}
+                    </span>
+                    <span className="text-sm font-medium">{step.name}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="group flex w-full flex-col border-l-4 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
@@ -194,7 +228,35 @@ export function SetUpAccountForm() {
                     )}
                   />
                 </div>
-                <div className="mt-2 sm:col-span-3">
+
+                <div className="sm:col-span-1">
+                  <FormField
+                    control={setUpAccountForm.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value={GENDERS.Male}>Male</SelectItem>
+                              <SelectItem value={GENDERS.Female}>
+                                Female
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mt-1 sm:col-span-2">
                   <FormField
                     control={setUpAccountForm.control}
                     name="birthdate"

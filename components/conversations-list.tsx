@@ -15,8 +15,11 @@ export async function ConversationsList({
     <aside className="fixed inset-y-0 left-0 hidden w-full overflow-y-auto border-r pb-20 lg:left-20 lg:block lg:w-80 lg:pb-0">
       <div className="px-5">
         <div className="flex-col">
-          <div className="py-4 text-2xl font-bold text-foreground">
-            Conversations
+          <div className="gap-2 py-4 text-foreground">
+            <p className="text-2xl font-bold">Conversations</p>
+            <p className="text-sm text-muted-foreground">
+              Talk to the people you matched with!
+            </p>
           </div>
 
           <ConversationsSearch

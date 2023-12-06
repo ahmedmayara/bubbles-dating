@@ -17,7 +17,6 @@ export function ConversationsListItem({ data, currentUser }: UserBoxProps) {
 
   async function handleClick() {
     const conversation = await getConversation(data.id);
-    console.log(conversation);
     router.push(`/app/conversations/${conversation.id}`);
   }
   return (

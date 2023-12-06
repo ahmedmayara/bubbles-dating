@@ -9,17 +9,16 @@ import { AiFillHeart } from "react-icons/ai";
 import { IoIosWarning } from "react-icons/io";
 
 import Cards, { Card } from "react-swipe-card";
-import { getAllInvitations, sendInvitation } from "@/actions/actions";
-import { format } from "date-fns";
+import { sendInvitation } from "@/actions/actions";
+import { GENDERS } from "@/schemas/schemas";
+
+import { IoFemale, IoMale } from "react-icons/io5";
 
 interface UserCardProps {
   users: User[];
-  invitations: Awaited<ReturnType<typeof getAllInvitations>>;
 }
 
-export function UserCard({ users, invitations }: UserCardProps) {
-  console.log(users);
-  console.log(invitations);
+export function UserCard({ users }: UserCardProps) {
   return (
     <div>
       <Cards onEnd={() => console.log("end")} className="h-screen w-full">
@@ -28,10 +27,10 @@ export function UserCard({ users, invitations }: UserCardProps) {
             key={user.id}
             onSwipeLeft={() => console.log("swipe left")}
             onSwipeRight={() => sendInvitation(user.id)}
-            className="h-full w-full rounded-xl shadow-lg"
+            className="h-full w-full rounded-xl"
           >
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-              <div className="flex cursor-grab flex-col overflow-hidden rounded-xl border bg-background shadow-lg">
+              <div className="flex cursor-grab flex-col overflow-hidden rounded-xl border bg-background">
                 {/** Profile image */}
                 <div className="flex items-center justify-center overflow-hidden rounded-t-xl">
                   {user.image && (
@@ -58,13 +57,26 @@ export function UserCard({ users, invitations }: UserCardProps) {
                 </div>
                 <div className="flex-1 rounded-b-xl">
                   <div className="flex flex-col space-y-2 p-4">
-                    <p className="text-2xl font-bold text-foreground">
-                      {user.name},{" "}
-                      <span className="font-medium text-muted-foreground">
-                        {new Date().getFullYear() -
-                          new Date(user?.birthdate!).getFullYear()}
-                      </span>
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">
+                          {user.name},{" "}
+                          <span className="font-medium text-muted-foreground">
+                            {new Date().getFullYear() -
+                              new Date(user?.birthdate!).getFullYear()}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div>
+                        {user.gender === GENDERS.Male && (
+                          <IoMale className="h-6 w-6 text-blue-400" />
+                        )}
+                        {user.gender === GENDERS.Female && (
+                          <IoFemale className="h-6 w-6 text-red-400" />
+                        )}
+                      </div>
+                    </div>
                     <div className="flex flex-col space-y-2">
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <BriefcaseIcon size={16} />

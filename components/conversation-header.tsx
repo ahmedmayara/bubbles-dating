@@ -1,25 +1,22 @@
 import getCurrentUser, { getConversation } from "@/actions/actions";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ChevronLeft, MoreHorizontalIcon } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { format } from "date-fns";
+import { ChevronLeft } from "lucide-react";
 import { DeleteConversationDialog } from "./delete-conversation-dialog";
-import { ViewProfileDialog } from "./view-profile-dialog";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { format } from "date-fns";
+import { BlockUserButton } from "./block-user-button";
+import { DeblockUserButton } from "./deblock-user-button";
 
 interface ConversationHeaderProps {
   conversationId: string;
+  status: string;
+  meOrnot: boolean;
 }
 
 export async function ConversationHeader({
   conversationId,
+  status,
+  meOrnot,
 }: ConversationHeaderProps) {
   const conversation = await getConversation(conversationId);
   const currentUser = await getCurrentUser();
@@ -55,27 +52,13 @@ export async function ConversationHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size={"icon"}
-              className="data-[state=open]:bg-muted"
-            >
-              <MoreHorizontalIcon className="h-4 w-4 text-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem>Block</DropdownMenuItem>
-              <DropdownMenuItem>Report</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {user && <ViewProfileDialog user={user} />}
-
         <DeleteConversationDialog conversationId={conversationId} />
+        {status === "active" && (
+          <BlockUserButton id={user?.id!} idofconv={conversationId} />
+        )}
+        {status === "BLOCKED" && meOrnot && (
+          <DeblockUserButton id={user?.id!} idofconv={conversationId} />
+        )}
       </div>
     </div>
   );

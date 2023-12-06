@@ -19,7 +19,7 @@ export interface CountrySelectValue {
 }
 
 interface CountrySelectProps {
-  value?: CountrySelectValue;
+  value?: CountrySelectValue | undefined;
   onValueChange: (value: CountrySelectValue) => void;
 }
 

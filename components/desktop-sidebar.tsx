@@ -11,6 +11,7 @@ import {
 import { UserButton } from "./user-button";
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { FilterDialog } from "./filter-dialog";
 
 interface DesktopSidebarProps {
   currentUser: User;
@@ -63,6 +64,7 @@ export function DesktopSidebar({ currentUser }: DesktopSidebarProps) {
                 onClick={item.onClick}
               />
             ))}
+            <FilterDialog />
           </ul>
         </nav>
         <nav className="mt-4 flex flex-col items-center justify-between">

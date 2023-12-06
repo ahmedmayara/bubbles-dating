@@ -111,6 +111,24 @@ export async function getAllUsers() {
               },
             },
           },
+          {
+            invitationsSent: {
+              some: {
+                receiver: {
+                  email: session.user.email,
+                },
+              },
+            },
+          },
+          {
+            invitationsReceived: {
+              some: {
+                sender: {
+                  email: session.user.email,
+                },
+              },
+            },
+          },
         ],
       },
     });
@@ -515,8 +533,17 @@ export async function setUpAccount(data: SetupAccountSchemaType) {
       });
     }
 
-    const { name, email, birthdate, image, bio, occupation, country, city } =
-      data;
+    const {
+      name,
+      email,
+      birthdate,
+      image,
+      bio,
+      occupation,
+      country,
+      city,
+      gender,
+    } = data;
 
     const currentUser = await db.user.findUnique({
       where: { email },
@@ -531,6 +558,7 @@ export async function setUpAccount(data: SetupAccountSchemaType) {
       data: {
         name,
         birthdate,
+        gender,
         image,
         bio,
         occupation,
@@ -545,5 +573,165 @@ export async function setUpAccount(data: SetupAccountSchemaType) {
       { message: "Something went wrong" },
       { status: 500 },
     );
+  }
+}
+
+export async function blockUser(id: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const blockedUser = await db.user.findUnique({
+      where: { id },
+    });
+
+    if (!blockedUser) {
+      return {
+        message: "Blocked user not found",
+      };
+    }
+    const bloke = await db.block.create({
+      data: {
+        blocker: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+        blocked: {
+          connect: {
+            id: blockedUser.id,
+          },
+        },
+      },
+    });
+    const updatestatusofconversation = await db.conversation.updateMany({
+      where: {
+        participantsIds: {
+          hasEvery: [currentUser.id, blockedUser.id],
+        },
+      },
+      data: {
+        status: "BLOCKED",
+        conversationBlockedBy: currentUser.id,
+      },
+    });
+
+    const idOfconversation = await db.conversation.findFirst({
+      where: {
+        participantsIds: {
+          hasEvery: [currentUser.id, blockedUser.id],
+        },
+      },
+    });
+    revalidatePath(`/app/conversations/${idOfconversation}`);
+
+    return bloke;
+  } catch (error) {
+    console.error("Error in blokceUser function:", error);
+    return {
+      message: "An error occurred",
+    };
+  }
+}
+
+export async function getMyUserBloked() {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const blockedUser = await db.block.findMany({
+      where: {
+        blockerId: currentUser.id,
+      },
+      include: {
+        blocked: true,
+      },
+    });
+
+    return blockedUser;
+  } catch (error) {
+    console.error("Error in blokceUser function:", error);
+    return {
+      message: "An error occurred",
+    };
+  }
+}
+
+export async function deblockUser(id: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const deblockedUser = await db.block.deleteMany({
+      where: {
+        blockerId: currentUser.id,
+        blockedId: id,
+      },
+    });
+
+    const updatestatusofconversation = await db.conversation.updateMany({
+      where: {
+        participantsIds: {
+          hasEvery: [currentUser.id, id],
+        },
+      },
+      data: {
+        status: "active",
+      },
+    });
+
+    revalidatePath("/app");
+
+    return deblockedUser;
+  } catch (error) {
+    console.error("Error in blokceUser function:", error);
+    return {
+      message: "An error occurred",
+    };
   }
 }

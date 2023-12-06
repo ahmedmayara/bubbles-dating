@@ -71,10 +71,16 @@ export const updateProfileSchema = z.object({
     }),
 });
 
+export enum GENDERS {
+  Male = "Male",
+  Female = "Female",
+}
+
 export const setupAccountSchema = z.object({
   name: z.string().min(2, {
     message: "The name field must be at least 2 characters long.",
   }),
+  gender: z.enum([GENDERS.Male, GENDERS.Female]),
   image: z.string().min(1, {
     message: "The image field is required.",
   }),

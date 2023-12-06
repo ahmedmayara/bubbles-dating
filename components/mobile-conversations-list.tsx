@@ -26,7 +26,7 @@ export async function MobileConversationsList({
 
       <div className="pt-1.5">
         <ConversationsSearch
-          className="mb-0 bg-background hover:bg-background focus:bg-background"
+          className="mb-0 rounded-lg bg-background py-3.5 hover:bg-background focus:bg-background"
           conversations={conversations}
           currentUser={currentUser}
         />
@@ -53,7 +53,12 @@ export async function MobileConversationsList({
         </div>
       </div>
 
-      <Separator className="mb-2" />
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">
+          Chat
+        </h3>
+        <Separator className="mb-2" />
+      </div>
       {Array.isArray(conversations) &&
         conversations.map((conversation) => (
           <MobileConversationsListItem
