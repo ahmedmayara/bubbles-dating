@@ -341,7 +341,7 @@ export async function getAllConversations() {
 
     return conversations;
   } catch (error) {
-    throw new Error("Something went wrong");
+    throw new Error("Something went wrong" + error);
   }
 }
 
