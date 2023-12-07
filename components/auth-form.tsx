@@ -98,25 +98,30 @@ export function AuthForm() {
 
   async function signInOnSubmit(values: SignInSchemaType) {
     try {
+      setIsLoading(true);
       signIn("credentials", {
         ...values,
         redirect: false,
-      }).then((callback) => {
-        if (callback?.error) {
-          toast({
-            title: "Error",
-            description: "Invalid credentials",
-            variant: "destructive",
-          });
-        }
-        if (callback?.ok && !callback?.error) {
-          toast({
-            title: "Success",
-            description: "Signed in successfully",
-            variant: "success",
-          });
-        }
-      });
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            toast({
+              title: "Error",
+              description: "Invalid credentials",
+              variant: "destructive",
+            });
+          }
+          if (callback?.ok && !callback?.error) {
+            toast({
+              title: "Success",
+              description: "Signed in successfully",
+              variant: "success",
+            });
+          }
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     } catch (error) {
       toast({
         title: "Error",
@@ -290,11 +295,19 @@ export function AuthForm() {
             }
           >
             {formVariant === FormVariant.SIGN_IN ? (
-              !signInForm.formState.isSubmitting && <span>Continue</span>
-            ) : !signUpForm.formState.isSubmitting ? (
-              <span>Continue</span>
-            ) : (
+              signInForm.formState.isSubmitting ||
+              signUpForm.formState.isSubmitting ||
+              isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Continue"
+              )
+            ) : signUpForm.formState.isSubmitting ||
+              signInForm.formState.isSubmitting ||
+              isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Continue"
             )}
           </Button>
         </CardFooter>

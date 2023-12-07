@@ -42,7 +42,7 @@ export function ConversationActions({
             Unblock
           </DropdownMenuItem>
         )}
-        {!meOrnot && status !== "BLOCKED" && (
+        {status === "ACTIVE" && (
           <DropdownMenuItem
             onClick={() => {
               blockUser(userId);
@@ -52,7 +52,6 @@ export function ConversationActions({
             Block
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem>Report</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

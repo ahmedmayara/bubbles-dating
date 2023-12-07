@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { DeleteConversationDialog } from "./delete-conversation-dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { format } from "date-fns";
 import { ConversationActions } from "./conversation-actions";
+import { ActiveText } from "./active-text";
 
 interface ConversationHeaderProps {
   conversationId: string;
@@ -41,12 +41,7 @@ export async function ConversationHeader({
           <div>
             <span className="font-semibold text-foreground">{user?.name}</span>
           </div>
-          <div className="text-xs text-muted-foreground">
-            <span>
-              Joined on{" "}
-              {format(new Date(user?.createdAt!), "MMMM dd, yyyy").toString()}
-            </span>
-          </div>
+          <ActiveText user={user!} />
         </div>
       </div>
 
