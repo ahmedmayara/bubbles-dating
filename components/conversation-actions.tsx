@@ -14,7 +14,6 @@ import { blockUser, deblockUser } from "@/actions/actions";
 
 interface ConversationActionsProps {
   userId: string;
-
   status: string;
   meOrnot: boolean;
 }
@@ -33,22 +32,24 @@ export function ConversationActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        {meOrnot && (
+        {meOrnot && status === "BLOCKED" && (
           <DropdownMenuItem
             onClick={() => {
-              if (status === "ACTIVE") {
-                blockUser(userId).then(() => {
-                  router.refresh();
-                });
-              } else if (status === "BLOCKED" && meOrnot) {
-                deblockUser(userId).then(() => {
-                  router.refresh();
-                });
-              }
+              deblockUser(userId);
+              router.refresh();
             }}
           >
-            {status === "ACTIVE" && "Block"}
-            {status === "BLOCKED" && meOrnot && "Unblock"}
+            Unblock
+          </DropdownMenuItem>
+        )}
+        {!meOrnot && status !== "BLOCKED" && (
+          <DropdownMenuItem
+            onClick={() => {
+              blockUser(userId);
+              router.refresh();
+            }}
+          >
+            Block
           </DropdownMenuItem>
         )}
         <DropdownMenuItem>Report</DropdownMenuItem>
