@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { db } from "@/db/db";
 import { NextResponse } from "next/server";
 import {
-  GENDERS,
+  ReportUserSchemaType,
   SetupAccountSchemaType,
   SignUpSchemaType,
   setupAccountSchema,
@@ -13,8 +13,6 @@ import {
 
 export interface GetAllUsersFilters {
   gender?: string;
-  maxAge?: number;
-  minAge?: number;
   location?: string;
 }
 
@@ -92,7 +90,7 @@ export async function getAllUsers(filters: GetAllUsersFilters) {
   try {
     const session = await getSession();
 
-    const { gender, maxAge, minAge, location } = filters;
+    const { gender, location } = filters;
 
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -111,13 +109,21 @@ export async function getAllUsers(filters: GetAllUsersFilters) {
       query.country = location;
     }
 
-    // Get all the users except the current user and the users that the current user has already invited them and
     const users = await db.user.findMany({
       where: {
         ...query,
         NOT: [
           {
             email: session.user.email,
+          },
+          {
+            reportedMe: {
+              some: {
+                reporter: {
+                  email: session.user.email,
+                },
+              },
+            },
           },
           {
             conversations: {
@@ -624,7 +630,7 @@ export async function blockUser(id: string) {
         message: "Blocked user not found",
       };
     }
-    const bloke = await db.block.create({
+    const block = await db.block.create({
       data: {
         blocker: {
           connect: {
@@ -638,7 +644,8 @@ export async function blockUser(id: string) {
         },
       },
     });
-    const updatestatusofconversation = await db.conversation.updateMany({
+
+    await db.conversation.updateMany({
       where: {
         participantsIds: {
           hasEvery: [currentUser.id, blockedUser.id],
@@ -647,6 +654,18 @@ export async function blockUser(id: string) {
       data: {
         status: "BLOCKED",
         conversationBlockedBy: currentUser.id,
+      },
+    });
+
+    // Increment the blocked user's total blocks
+    await db.user.update({
+      where: {
+        id: blockedUser.id,
+      },
+      data: {
+        totalBlocks: {
+          increment: 1,
+        },
       },
     });
 
@@ -659,7 +678,7 @@ export async function blockUser(id: string) {
     });
     revalidatePath(`/app/conversations/${idOfconversation}`);
 
-    return bloke;
+    return block;
   } catch (error) {
     console.error("Error in blokceUser function:", error);
     return {
@@ -668,7 +687,7 @@ export async function blockUser(id: string) {
   }
 }
 
-export async function getMyUserBloked() {
+export async function getMyUserblockd() {
   try {
     const session = await getSession();
 
@@ -699,7 +718,7 @@ export async function getMyUserBloked() {
 
     return blockedUser;
   } catch (error) {
-    console.error("Error in blokceUser function:", error);
+    console.error("Error in blockUser function:", error);
     return {
       message: "An error occurred",
     };
@@ -748,7 +767,157 @@ export async function deblockUser(id: string) {
 
     return deblockedUser;
   } catch (error) {
-    console.error("Error in blokceUser function:", error);
+    console.error("Error in unblockUser function:", error);
+    return {
+      message: "An error occurred",
+    };
+  }
+}
+
+export async function reportUser(id: string, reason: ReportUserSchemaType) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const user = await db.report.create({
+      data: {
+        reporter: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+        reported: {
+          connect: {
+            id: id,
+          },
+        },
+        reason: reason.reason,
+      },
+    });
+
+    // Increment the reported user's total reports
+    await db.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        totalReports: {
+          increment: 1,
+        },
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error in reportUser function:", error);
+    return {
+      message: "An error occurred",
+    };
+  }
+}
+
+export async function setAccountStatus(
+  id: string,
+  status: "ACTIVE" | "DISABLED",
+) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const user = await db.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: status,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error in SET-ACCOUNT-STATUS function:", error);
+    return {
+      message: "An error occurred",
+    };
+  }
+}
+
+export async function getStatusOfUser(email: string) {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!user) {
+    return false;
+  }
+  if (user.status === "ACTIVE") return true;
+  else return false;
+}
+
+export async function getReportsById(id: string) {
+  try {
+    const session = await getSession();
+
+    if (!session?.user?.email) {
+      return {
+        message: "Not authenticated",
+      };
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!currentUser) {
+      return {
+        message: "Current user not found",
+      };
+    }
+
+    const reports = await db.report.findMany({
+      where: {
+        reportedId: id,
+      },
+      include: {
+        reporter: true,
+        reported: true,
+      },
+    });
+
+    return reports;
+  } catch (error) {
+    console.error("Error in getReportsById function:", error);
     return {
       message: "An error occurred",
     };
