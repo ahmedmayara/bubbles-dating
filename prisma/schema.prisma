@@ -23,6 +23,9 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  role ROLE @default(USER)
+  status ACCOUNT_STATUS @default(ACTIVE)
+
   conversationsIds String[]       @db.ObjectId
   conversations    Conversation[] @relation(fields: [conversationsIds], references: [id])
 
@@ -34,9 +37,11 @@ model User {
 
   blockedMe   Block[] @relation("BlockedMe")
   blockedByMe Block[] @relation("BlockedByMe")
+  totalBlocks Int     @default(0)
 
   reportedMe   Report[] @relation("ReportedMe")
   reportedByMe Report[] @relation("ReportedByMe")
+  totalReports Int      @default(0)
 }
 
 model Account {
@@ -128,4 +133,14 @@ enum STATUS {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum ROLE {
+  ADMIN
+  USER
+}
+
+enum ACCOUNT_STATUS {
+  ACTIVE
+  DISABLED
 }

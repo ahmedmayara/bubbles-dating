@@ -114,8 +114,15 @@ export const setupAccountSchema = z.object({
     }),
 });
 
+export const reportUserSchema = z.object({
+  reason: z.string().min(1, {
+    message: "The reason field is required.",
+  }),
+});
+
 export type SignInSchemaType = z.infer<typeof signInSchema>;
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 export type CreateMessageSchemaType = z.infer<typeof createMessageSchema>;
 export type UpdateProfileSchemaType = z.infer<typeof updateProfileSchema>;
 export type SetupAccountSchemaType = z.infer<typeof setupAccountSchema>;
+export type ReportUserSchemaType = z.infer<typeof reportUserSchema>;

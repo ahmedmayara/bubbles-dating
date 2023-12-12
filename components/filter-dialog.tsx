@@ -11,12 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MinusIcon, SlidersHorizontalIcon } from "lucide-react";
+import { SlidersHorizontalIcon } from "lucide-react";
 import { GENDERS } from "@/schemas/schemas";
 import { Separator } from "./ui/separator";
-import { Slider } from "./ui/slider";
 import { CountrySelect } from "@/app/setup-account/_components/country-select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
 
 export interface CountrySelectValue {
@@ -33,7 +32,6 @@ export function FilterDialog() {
 
   const [open, setOpen] = React.useState(false);
   const [selectedGender, setSelectedGender] = React.useState("");
-  const [selectedAge, setselectedAge] = React.useState([18, 28]);
   const [selectedLocation, setSelectedLocation] = React.useState<
     CountrySelectValue | undefined
   >(undefined);
@@ -48,8 +46,6 @@ export function FilterDialog() {
     const updatedQuery: any = {
       ...currentQuery,
       gender: selectedGender,
-      minAge: selectedAge[0],
-      maxAge: selectedAge[1],
       location: selectedLocation?.label,
     };
 
@@ -64,7 +60,7 @@ export function FilterDialog() {
     setOpen(false);
 
     router.push(url);
-  }, [params, router, selectedAge, selectedGender, selectedLocation, open]);
+  }, [params, router, selectedGender, selectedLocation, open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -123,41 +119,6 @@ export function FilterDialog() {
 
         <Separator />
 
-        <div>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-semibold">Age</h1>
-            <p className="text-sm text-muted-foreground">
-              Select one or more options.
-            </p>
-          </div>
-
-          <div className="mt-4">
-            <Slider
-              min={18}
-              max={28}
-              step={1}
-              value={selectedAge}
-              secondValue={selectedAge[1]}
-              onSecondChange={(value) =>
-                setselectedAge([selectedAge[0], value])
-              }
-              onValueChange={(value) => setselectedAge(value)}
-            />
-
-            <div className="mt-6 flex flex-row items-center justify-between gap-x-4">
-              <div className="w-1/2 rounded-xl border p-3">
-                {selectedAge[0]} years
-              </div>
-              <div className="text-xl text-muted-foreground">
-                <MinusIcon className="h-6 w-6 text-border" />
-              </div>
-              <div className="w-1/2 rounded-xl border p-3">
-                {selectedAge[1]} years
-              </div>
-            </div>
-          </div>
-        </div>
-
         <Separator />
 
         <div>
@@ -187,7 +148,6 @@ export function FilterDialog() {
               onClick={() => {
                 setOpen(false);
                 setSelectedGender("");
-                setselectedAge([18, 28]);
                 setSelectedLocation(undefined);
                 router.push("/app");
               }}

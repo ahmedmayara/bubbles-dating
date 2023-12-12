@@ -35,7 +35,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 import { TbBrandGoogle } from "react-icons/tb";
-import { signUp } from "@/actions/actions";
+import getCurrentUser, { getStatusOfUser, signUp } from "@/actions/actions";
 import { signIn, useSession } from "next-auth/react";
 import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -52,9 +52,19 @@ export function AuthForm() {
   const { setEmail, setName, setPassword } = useUser();
 
   React.useEffect(() => {
-    if (session?.status === "authenticated") {
-      router.push("/app");
-    }
+    const fetchUser = async () => {
+      if (session?.status === "authenticated") {
+        await getCurrentUser().then((user) => {
+          if (user.role === "ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/app");
+          }
+        });
+      }
+    };
+
+    fetchUser();
   }, [session, router]);
 
   const toggleFormVariant = React.useCallback(() => {
@@ -98,6 +108,17 @@ export function AuthForm() {
 
   async function signInOnSubmit(values: SignInSchemaType) {
     try {
+      const isActive = await getStatusOfUser(values.email);
+
+      if (!isActive) {
+        toast({
+          title: "Error",
+          description: "Your account is disabled",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setIsLoading(true);
       signIn("credentials", {
         ...values,

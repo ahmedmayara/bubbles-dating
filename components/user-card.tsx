@@ -13,6 +13,7 @@ import { sendInvitation } from "@/actions/actions";
 import { GENDERS } from "@/schemas/schemas";
 
 import { IoFemale, IoMale } from "react-icons/io5";
+import { ReportUserButton } from "./report-user-button";
 
 interface UserCardProps {
   users: User[];
@@ -115,12 +116,7 @@ export function UserCard({ users }: UserCardProps) {
                     >
                       <AiFillHeart size={32} className="text-green-500" />
                     </Button>
-                    <Button
-                      className="h-16 w-16 rounded-full shadow-xl"
-                      variant={"outline"}
-                    >
-                      <IoIosWarning size={32} className="text-yellow-600" />
-                    </Button>
+                    <ReportUserButton id={user.id} />
                   </div>
                 </div>
               </div>
